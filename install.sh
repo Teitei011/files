@@ -18,4 +18,5 @@ echo "Installing all other programs..."
 yay -S btop htop cpu-x obsidian telegram-desktop brave-browser nextcloud-client aur/jellyfin-media-player stacer-git easyeffects noisetorch-git tlp
 
 
+
 rm -r yay 
