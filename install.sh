@@ -15,8 +15,12 @@ echo "Installing yay..."
 makepkg -si 
 
 echo "Installing all other programs..."
-yay -S btop htop cpu-x obsidian telegram-desktop brave-browser nextcloud-client aur/jellyfin-media-player stacer-git easyeffects noisetorch-git tlp
-
+yay -S btop htop cpu-x obsidian telegram-desktop brave-browser nextcloud-client aur/jellyfin-media-player stacer-git easyeffects noisetorch-git tlp community/gnome-multi-writer extra/transmission-qt
 
 
 rm -r yay 
+
+echo "Done!"
+
+echo "You have to start tlp"
+
