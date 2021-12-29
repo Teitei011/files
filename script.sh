@@ -1,42 +1,45 @@
-# Update
+echo Update
 sudo apt update && sudo apt upgrade 
 sudo apt list --upgradable
 sudo apt upgrade
 
-# System
+echo System
 sudo adduser server
 sudo chage -d0 server
 sudo usermod -a -G sudo server
 
-# SSH
-su - server
-ssh-keygen -t RSA -b 2048
+echo Hostaname
+sudo hostnamectl set-hostname server
+
+echo SSH
+#su - server
+#ssh-keygen -t RSA -b 2048
 
 # https://www.tecmint.com/initial-ubuntu-server-setup-guide/
 
-# UFW
+echo UFW
 sudo systemctl status ufw
 
 sudo ufw allow 2345/tcp #SSH
-sudo ufw allow 8080 # Pihole
-sudo ufw allow 8090 # Homer
+sudo ufw allow 8081 # Pihole
+sudo ufw allow 80 # Homer
 sudo ufw allow 8096 # Jellyfin
-sudo ufw allow 80   # Nextcloud
+sudo ufw allow 8080   # Nextcloud
 sudo ufw allow 8082 # Calibre
 
 sudo ufw enable
 
-# Server time
+echo Server time
 sudo timedatectl
 sudo timedatectl list-timezones 
 sudo timedatectl set-timezone America/Sao_Paulo
 
-# Snap
+echo Snap
 sudo apt install snapd
 sudo snap install core
 
 
-# Docker
+echo Docker
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
@@ -49,14 +52,12 @@ su - ${USER}
 groups
 
 
-# Nextcloud
+echo Nextcloud
 
 #8080
-sudo snap install nextcloud
-sudo nextcloud.occ config:system:set trusted_domains 1 --value=teitei.sytes.net
-sudo nextcloud.enable-https self-signed
+docker run -d -p 8080:80 nextcloud
 
-# Jellyfin
+echo Jellyfin
 
 #8096
 echo "deb [arch=$( dpkg --print-architecture )] https://repo.jellyfin.org/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/jellyfin.list
@@ -68,13 +69,13 @@ sudo apt install jellyfin
 sudo systemctl start jellyfin
 
 
-# Pihole
+echo Pihole
 
-#8080
+#8081
 docker run -d \
     --name pihole \
     -p 53:53/tcp -p 53:53/udp \
-    -p 8080:8080 \
+    -p 8081:8081 \
     -e TZ="America/Sao_Paulo" \
     -v "${PIHOLE_BASE}/etc-pihole:/etc/pihole" \
     -v "${PIHOLE_BASE}/etc-dnsmasq.d:/etc/dnsmasq.d" \
@@ -84,12 +85,12 @@ docker run -d \
     -e VIRTUAL_HOST="pi.hole" \
     -e PROXY_LOCATION="pi.hole" \
     -e ServerIP="127.0.0.1" \
-    -e WEB_PORT=8080 \
+    -e WEB_PORT=8081 \
     pihole/pihole:latest
 
 docker exec -it pihole pihole -a -p
 
-# Calibre-web
+echo Calibre-web
 mkdir -p /volume1/books/calibre
 chown -R root:users /volume1/
 chmod -R 770 /volume1
@@ -98,12 +99,12 @@ docker create --name=calibre-web --restart=always -v /volume1/books/calibre:/boo
 docker start calibre-web
 
 
-# Homer
+echo Homer
 
-#8090
+#80
 mkdir Homer
 docker run -d \
-  -p 8090:8090 \
+  -p 80:80 \
   -v ~/Homer:/www/assets \
   --restart=always \
   b4bz/homer:latest
